@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 
 type Attendance = {
   employeeId: {
-    name:string;
+    name: string;
     _id: string;
   };
   checkInTime: string;
@@ -27,7 +27,9 @@ interface AttendanceTableProps {
 
 export default function AttendanceTable({ attendance }: AttendanceTableProps) {
   const [search, setSearch] = useState("");
-  const [filteredAttendance, setFilteredAttendance] = useState<Attendance[]>([]);
+  const [filteredAttendance, setFilteredAttendance] = useState<Attendance[]>(
+    []
+  );
 
   useEffect(() => {
     if (attendance.length) {
@@ -36,6 +38,8 @@ export default function AttendanceTable({ attendance }: AttendanceTableProps) {
           e.employeeId.name.toLowerCase().includes(search.toLowerCase())
         )
       );
+    } else {
+      setFilteredAttendance([]);
     }
   }, [search, attendance]);
 
@@ -61,10 +65,18 @@ export default function AttendanceTable({ attendance }: AttendanceTableProps) {
         <Table className="text-center">
           <TableHeader>
             <TableRow className="bg-gray-100 dark:bg-gray-800">
-              <TableHead className="font-semibold">الاسم</TableHead>
-              <TableHead className="font-semibold">وقت الدخول</TableHead>
-              <TableHead className="font-semibold">وقت الخروج</TableHead>
-              <TableHead className="font-semibold">إجمالي الساعات</TableHead>
+              <TableHead className="text-center w-[30%] font-semibold">
+                الاسم
+              </TableHead>
+              <TableHead className="text-center w-[20%] font-semibold">
+                وقت الدخول
+              </TableHead>
+              <TableHead className="text-center w-[20%] font-semibold">
+                وقت الخروج
+              </TableHead>
+              <TableHead className="text-center w-[30%] font-semibold">
+                إجمالي الساعات
+              </TableHead>
             </TableRow>
           </TableHeader>
 
@@ -75,14 +87,19 @@ export default function AttendanceTable({ attendance }: AttendanceTableProps) {
                   key={index}
                   className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition"
                 >
-                  <TableCell className="font-medium text-gray-900 dark:text-gray-100">
+                  <TableCell className="text-center w-[30%] font-medium">
                     {item.employeeId.name}
                   </TableCell>
 
-                  <TableCell>{formatTime(item.checkInTime)}</TableCell>
-                  <TableCell>{formatTime(item.checkOutTime)}</TableCell>
+                  <TableCell className="text-center w-[20%]">
+                    {formatTime(item.checkInTime)}
+                  </TableCell>
 
-                  <TableCell>
+                  <TableCell className="text-center w-[20%]">
+                    {formatTime(item.checkOutTime)}
+                  </TableCell>
+
+                  <TableCell className="text-center w-[30%]">
                     {item.totalHours ? `${item.totalHours} ساعة` : "-"}
                   </TableCell>
                 </TableRow>

@@ -31,16 +31,19 @@ const menuByRole: Record<string, any[]> = {
   manager: [
     { title: "الرئيسية", url: "/dashboard", icon: Home },
     { title: "الموظفين", url: "/employees", icon: Inbox },
+    { title: "الحضور", url: "/attendance", icon: Clock },
     { title: "الإيرادات", url: "/revenues", icon: Calendar },
     { title: "الكافتريات", url: "/cafes", icon: Calendar },
     { title: "الحجوزات VIP", url: "/reservation", icon: Inbox },
+    { title: "لوائح وقوانين الشركة", url: "/rules", icon: FileText },
 
     {
       title: "الإعدادات",
       icon: Settings,
       children: [
-        { title: "الاشنطة", url: "/settings/activities" },
-        { title: "الإعدادات العامة", url: "/dashboard/settings" },
+        { title: "الانشطة", url: "/settings/activities"},
+        { title: "الفروع", url: "/settings/branches" },
+         { title: "الاصناف", url: "/settings/categories" },
       ],
     },
   ],
