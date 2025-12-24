@@ -2,21 +2,38 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const user = req.cookies.get("user")?.value;
   const { pathname } = req.nextUrl;
 
-  console.log(user)
-  const publicPaths = ["/login", "/", "/reset-password"];
+  const publicPaths = ["/login", "/reset-password"];
+  const empPaths = ["/attendance", "/rules"];
 
   if (publicPaths.includes(pathname)) {
     return NextResponse.next();
   }
 
-  if (!user) {
+  const userCookie = req.cookies.get("user")?.value;
+
+  if (!userCookie) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  return NextResponse.next();
+  let user: any;
+
+  try {
+    user = JSON.parse(userCookie);
+  } catch (err) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  if (user.role === "manager") {
+    return NextResponse.next();
+  }
+
+  if (empPaths.includes(pathname)) {
+    return NextResponse.next();
+  }
+
+  return NextResponse.redirect(new URL("/attendance", req.url));
 }
 
 export const config = {

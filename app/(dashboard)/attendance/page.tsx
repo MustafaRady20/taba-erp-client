@@ -27,7 +27,7 @@ export default function EmployeeAttendancePage() {
   const fetchAttendance = async (selectedDate: string) => {
     try {
       const endpoint =
-        role === "employee"
+        role === "employee" || role === "supervisor"
           ? `${BASE_URL}/attendance/today`
           : `${BASE_URL}/attendance/by-date?date=${selectedDate}`;
 

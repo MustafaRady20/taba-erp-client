@@ -364,9 +364,8 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Reservation Insights */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Reservation Stats */}
+       
+        {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <Card className="bg-white dark:bg-gray-800 border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300">
             <CardHeader className="border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20">
               <div className="flex items-center gap-3">
@@ -402,7 +401,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Top Countries */}
           <Card className="bg-white dark:bg-gray-800 border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 lg:col-span-2">
             <CardHeader className="border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-teal-50 to-green-50 dark:from-teal-900/20 dark:to-green-900/20">
               <div className="flex items-center gap-3">
@@ -439,10 +437,9 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
 
-        {/* Gender Distribution (if available) */}
-        {data.reservationInsights.reservationsByGender.length > 0 && (
+        {/* {data.reservationInsights.reservationsByGender.length > 0 && (
           <Card className="bg-white dark:bg-gray-800 border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 mb-8">
             <CardHeader className="border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20">
               <div className="flex items-center gap-3">
@@ -468,7 +465,7 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-        )}
+        )} */}
       </div>
     </div>
   );

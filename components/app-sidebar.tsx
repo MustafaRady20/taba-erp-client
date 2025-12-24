@@ -52,6 +52,12 @@ const menuByRole: Record<string, any[]> = {
     { title: "الحضور", url: "/attendance", icon: Clock },
     { title: "لوائح وقوانين الشركة", url: "/rules", icon: FileText },
   ],
+
+  supervisor:[
+    { title: "الحضور", url: "/attendance", icon: Clock },
+    { title: "لوائح وقوانين الشركة", url: "/rules", icon: FileText },
+
+  ]
 };
 
 export function AppSidebar() {
