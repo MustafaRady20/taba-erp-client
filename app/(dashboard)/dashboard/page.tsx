@@ -59,7 +59,7 @@ export default function DashboardPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-2">
                 <DollarSign className="w-10 h-10 text-white" />
-                <p className="text-white/80 text-sm">إجمالي الإيرادات</p>
+                <p className="text-white/80 text-sm"> إجمالي إيرادات العمال</p>
               </div>
               <p className="text-4xl font-extrabold text-white">
                 {data.summary?.totalRevenue.toLocaleString("ar-EG")}
@@ -73,7 +73,7 @@ export default function DashboardPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-2">
                 <TrendingUp className="w-10 h-10 text-white" />
-                <p className="text-white/80 text-sm">صافي الربح</p>
+                <p className="text-white/80 text-sm"> المقاهي صافي الربح</p>
               </div>
               <p className="text-4xl font-extrabold text-white">
                 {data.summary.netProfit.toLocaleString("ar-EG")}
@@ -87,7 +87,7 @@ export default function DashboardPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-2">
                 <ShoppingCart className="w-10 h-10 text-white" />
-                <p className="text-white/80 text-sm">إجمالي المشتريات</p>
+                <p className="text-white/80 text-sm">إجمالي مشتريات المقاهي</p>
               </div>
               <p className="text-4xl font-extrabold text-white">
                 {data.summary.totalPurchaseCost.toLocaleString("ar-EG")}
