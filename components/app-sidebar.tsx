@@ -36,6 +36,8 @@ const menuByRole: Record<string, any[]> = {
     { title: "الكافتريات", url: "/cafes", icon: Calendar },
     { title: "الحجوزات VIP", url: "/reservation", icon: Inbox },
     { title: "لوائح وقوانين الشركة", url: "/rules", icon: FileText },
+    { title: "الرواتب الشهرية", url: "/salaries", icon: FileText },
+
 
     {
       title: "الإعدادات",
