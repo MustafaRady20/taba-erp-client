@@ -74,7 +74,7 @@ type VipRevenue = {
 
 export default function VipRevenuesPage() {
   const API = `${BASE_URL}/vip-revenues`;
-  const EMP_API = `${BASE_URL}http://localhost:8080/employees`;
+  const EMP_API = `${BASE_URL}/employees`;
 
   /* ===================== State ===================== */
 
