@@ -33,19 +33,23 @@ const menuByRole: Record<string, any[]> = {
     { title: "الموظفين", url: "/employees", icon: Inbox },
     { title: "الحضور", url: "/attendance", icon: Clock },
     { title: "الإيرادات", url: "/revenues", icon: Calendar },
-    { title: "الكافتريات", url: "/cafes", icon: Calendar },
+    {
+      title: "الكافتريات",
+      url: "/cafes",
+      icon: Calendar,
+      children: [{ title: "الايرادات", url: "/vip-revenue" }],
+    },
     { title: "الحجوزات VIP", url: "/reservation", icon: Inbox },
     { title: "لوائح وقوانين الشركة", url: "/rules", icon: FileText },
     { title: "الرواتب الشهرية", url: "/salaries", icon: FileText },
-
 
     {
       title: "الإعدادات",
       icon: Settings,
       children: [
-        { title: "الانشطة", url: "/settings/activities"},
+        { title: "الانشطة", url: "/settings/activities" },
         { title: "الفروع", url: "/settings/branches" },
-         { title: "الاصناف", url: "/settings/categories" },
+        { title: "الاصناف", url: "/settings/categories" },
       ],
     },
   ],
@@ -55,11 +59,10 @@ const menuByRole: Record<string, any[]> = {
     { title: "لوائح وقوانين الشركة", url: "/rules", icon: FileText },
   ],
 
-  supervisor:[
+  supervisor: [
     { title: "الحضور", url: "/attendance", icon: Clock },
     { title: "لوائح وقوانين الشركة", url: "/rules", icon: FileText },
-
-  ]
+  ],
 };
 
 export function AppSidebar() {
