@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import {
   Card,
   CardContent,
@@ -103,16 +104,15 @@ export default function VipRevenuesPage() {
   /* ===================== Fetch ===================== */
 
   const fetchRevenues = async () => {
-    const params = new URLSearchParams();
+    const params: any = {};
 
-    if (filterEmployee) params.append('employee', filterEmployee);
-    if (fromDate) params.append('fromDate', fromDate);
-    if (toDate) params.append('toDate', toDate);
+    if (filterEmployee) params.employee = filterEmployee;
+    if (fromDate) params.fromDate = fromDate;
+    if (toDate) params.toDate = toDate;
 
-    const res = await fetch(`${API}?${params.toString()}`);
-    const json = await res.json();
+    const res = await axios.get(API, { params });
 
-    const revenuesData = Array.isArray(json) ? json : [];
+    const revenuesData = Array.isArray(res.data) ? res.data : [];
     setRevenues(revenuesData);
     
     // Calculate filtered total
@@ -123,15 +123,13 @@ export default function VipRevenuesPage() {
   };
 
   const fetchTotal = async () => {
-    const res = await fetch(`${API}/statistics/total`);
-    const json = await res.json();
-    setTotal(json?.total || 0);
+    const res = await axios.get(`${API}/statistics/total`);
+    setTotal(res.data?.total || 0);
   };
 
   const fetchEmployees = async () => {
-    const res = await fetch(EMP_API);
-    const json = await res.json();
-    setEmployees(Array.isArray(json) ? json : []);
+    const res = await axios.get(EMP_API);
+    setEmployees(Array.isArray(res.data) ? res.data : []);
   };
 
   useEffect(() => {
@@ -145,15 +143,11 @@ export default function VipRevenuesPage() {
   const addRevenue = async () => {
     if (!serialNumber || !amount || !employee) return;
 
-    await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        serialNumber,
-        amount: Number(amount),
-        date,
-        employee,
-      }),
+    await axios.post(API, {
+      serialNumber,
+      amount: Number(amount),
+      date,
+      employee,
     });
 
     setSerialNumber('');
@@ -283,7 +277,7 @@ export default function VipRevenuesPage() {
                           className="text-slate-900 dark:text-white"
                         />
                         <CommandEmpty className="text-slate-500 dark:text-slate-400">لا يوجد نتائج</CommandEmpty>
-                        <CommandGroup>
+                        <CommandGroup className="max-h-[200px] overflow-y-auto">
                           {employees.map((emp) => (
                             <CommandItem
                               key={emp._id}
@@ -440,7 +434,7 @@ export default function VipRevenuesPage() {
                         className="text-slate-900 dark:text-white"
                       />
                       <CommandEmpty className="text-slate-500 dark:text-slate-400">لا يوجد نتائج</CommandEmpty>
-                      <CommandGroup>
+                      <CommandGroup className="max-h-[200px] overflow-y-auto">
                         {employees.map((emp) => (
                           <CommandItem
                             key={emp._id}
