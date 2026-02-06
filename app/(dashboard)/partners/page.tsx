@@ -50,11 +50,26 @@ interface PartnerProfit {
   _id: string;
   partner: Partner | string;
   activity: Activity | string;
-  date: string;
+  month: number;
   profit: number;
   createdAt: string;
 }
 
+
+const months = [
+  "يناير",
+  "فبراير",
+  "مارس",
+  "أبريل",
+  "مايو",
+  "يونيو",
+  "يوليو",
+  "أغسطس",
+  "سبتمبر",
+  "أكتوبر",
+  "نوفمبر",
+  "ديسمبر",
+];
 export default function PartnersManagementPage() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -78,7 +93,7 @@ export default function PartnersManagementPage() {
     partner: "",
     activity: "",
     profit: "",
-    date: new Date().toISOString().split("T")[0],
+    month:0,
   });
 
   const [notification, setNotification] = useState<{
@@ -206,7 +221,7 @@ export default function PartnersManagementPage() {
           partner: "",
           activity: "",
           profit: "",
-          date: new Date().toISOString().split("T")[0],
+          month: 0,
         });
         fetchData();
       }
@@ -247,7 +262,7 @@ export default function PartnersManagementPage() {
           partner: "",
           activity: "",
           profit: "",
-          date: new Date().toISOString().split("T")[0],
+          month:0,
         });
         fetchData();
       }
@@ -314,7 +329,7 @@ export default function PartnersManagementPage() {
             ? profit.activity
             : profit.activity?._id || "",
         profit: profit.profit.toString(),
-        date: new Date(profit.date).toISOString().split("T")[0],
+        month: profit.month,
       });
     } else {
       setSelectedProfit(null);
@@ -322,7 +337,7 @@ export default function PartnersManagementPage() {
         partner: "",
         activity: "",
         profit: "",
-        date: new Date().toISOString().split("T")[0],
+        month: 0,
       });
     }
     setProfitDialogOpen(true);
@@ -559,7 +574,7 @@ export default function PartnersManagementPage() {
                         </Badge>
                       </TableCell>
                        <TableCell className="text-right">
-                        {new Date(profit.date).toLocaleDateString("ar-EG")}
+                        {months[profit.month]}
                       </TableCell>
                       <TableCell className="font-medium text-right">
                         {getPartnerName(profit.partner)}
@@ -680,16 +695,24 @@ export default function PartnersManagementPage() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="date">التاريخ *</Label>
-              <Input
-                id="date"
-                type="date"
-                value={profitForm.date}
+              <Label htmlFor="date">الشهر *</Label>
+              <select
+                id="month"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                value={profitForm.month}
                 onChange={(e) =>
-                  setProfitForm({ ...profitForm, date: e.target.value })
+                  setProfitForm({ ...profitForm, month: Number(e.target.value) })
                 }
                 required
-              />
+              >
+                <option value="">اختر الشهر</option>
+                {months.map((month,index) => (
+                  <option key={index} value={index}>
+                    {month}
+                  </option>
+                ))}
+              </select>
+             
             </div>
           </div>
           <DialogFooter>

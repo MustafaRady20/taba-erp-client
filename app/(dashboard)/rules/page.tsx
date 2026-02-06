@@ -69,7 +69,7 @@ export default function RulesPage() {
 
   const handleAddRule = async () => {
     try {
-      const res = await axios.post(`${BASE_URL}}/rules`, form);
+      const res = await axios.post(`${BASE_URL}/rules`, form);
       setRules([res.data, ...rules]);
       setShowModal(false);
       setForm({ title: "", description: "", type: "rule" });
