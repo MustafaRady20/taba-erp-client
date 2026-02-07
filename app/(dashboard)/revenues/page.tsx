@@ -47,7 +47,7 @@ import {
 interface CurrencyEntry {
   currency: string; // currency _id
   amount: number;
-  exchangeRate: number;
+  exchangeRate?: number; // اختياري - إذا لم يتم إدخاله، نستخدم السعر من الباك اند
 }
 
 interface EmployeeRevenue {
@@ -85,6 +85,7 @@ interface Currency {
   _id: string;
   name: string;
   code: string;
+  exchangeRate: number; // السعر التلقائي من الباك اند
 }
 
 // ─── Reusable Multi-Currency Input ────────────────────────────────────────────
@@ -98,7 +99,7 @@ interface MultiCurrencyInputProps {
 
 function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: MultiCurrencyInputProps) {
   const addEntry = () => {
-    onChange([...entries, { currency: "", amount: 0, exchangeRate: 0 }]);
+    onChange([...entries, { currency: "", amount: 0 }]);
   };
 
   const removeEntry = (index: number) => {
@@ -113,92 +114,161 @@ function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: Mul
     );
   };
 
+  // عند اختيار عملة جديدة، نمسح سعر الصرف المخصص عشان يستخدم السعر التلقائي
+  const handleCurrencyChange = (index: number, currencyId: string) => {
+    onChange(
+      entries.map((entry, i) =>
+        i === index
+          ? {
+              currency: currencyId,
+              amount: entry.amount,
+              // نحذف exchangeRate عشان يستخدم السعر التلقائي من الباك اند
+            }
+          : entry
+      )
+    );
+  };
+
+  // الحصول على سعر الصرف الفعلي (المُدخل أو التلقائي من الباك اند)
+  const getEffectiveExchangeRate = (entry: CurrencyEntry): number => {
+    // لو المستخدم دخل سعر مخصص، استخدمه
+    if (entry.exchangeRate !== undefined && entry.exchangeRate > 0) {
+      return entry.exchangeRate;
+    }
+    // لو مدخلش، استخدم السعر التلقائي من الباك اند
+    const currency = currencies.find((c) => c._id === entry.currency);
+    return currency?.exchangeRate || 0;
+  };
+
   // currencies already used (to optionally disable duplicates)
   const usedCurrencyIds = entries.map((e) => e.currency).filter(Boolean);
 
   return (
     <div className="flex flex-col gap-3">
-      {entries.map((entry, index) => (
-        <div
-          key={index}
-          className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 space-y-3"
-        >
-          {/* Row label */}
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-              العملة {index + 1}
-            </span>
-            {entries.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeEntry(index)}
-                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+      {entries.map((entry, index) => {
+        const effectiveRate = getEffectiveExchangeRate(entry);
+        const selectedCurrency = currencies.find((c) => c._id === entry.currency);
+        const isUsingDefaultRate = !entry.exchangeRate || entry.exchangeRate === 0;
 
-          {/* Currency Select */}
-          <Select
-            options={currencies.map((c) => ({
-              value: c._id,
-              label: `${c.name} (${c.code})`,
-              isDisabled: usedCurrencyIds.includes(c._id) && entry.currency !== c._id,
-            }))}
-            value={
-              entry.currency
-                ? {
-                    value: entry.currency,
-                    label: currencies.find((c) => c._id === entry.currency)
-                      ? `${currencies.find((c) => c._id === entry.currency)!.name} (${currencies.find((c) => c._id === entry.currency)!.code})`
-                      : "",
+        return (
+          <div
+            key={index}
+            className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 space-y-3"
+          >
+            {/* Row label */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                العملة {index + 1}
+              </span>
+              {entries.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeEntry(index)}
+                  className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Currency Select */}
+            <Select
+              options={currencies.map((c) => ({
+                value: c._id,
+                label: `${c.name} (${c.code})`,
+                isDisabled: usedCurrencyIds.includes(c._id) && entry.currency !== c._id,
+              }))}
+              value={
+                entry.currency
+                  ? {
+                      value: entry.currency,
+                      label: selectedCurrency
+                        ? `${selectedCurrency.name} (${selectedCurrency.code})`
+                        : "",
+                    }
+                  : null
+              }
+              onChange={(val: any) => handleCurrencyChange(index, val?.value || "")}
+              placeholder="اختر العملة"
+              styles={selectStyles}
+              isSearchable
+              isOptionDisabled={(option: any) => option.isDisabled}
+            />
+
+            {/* Amount + Exchange Rate row */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-600 dark:text-slate-400">
+                  المبلغ <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="number"
+                  placeholder="المبلغ"
+                  value={entry.amount || ""}
+                  onChange={(e) => updateEntry(index, "amount", Number(e.target.value))}
+                  className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-sm"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-600 dark:text-slate-400">
+                  سعر الصرف (اختياري)
+                </Label>
+                <Input
+                  type="number"
+                  placeholder={
+                    selectedCurrency?.exchangeRate 
+                      ? `افتراضي: ${selectedCurrency.exchangeRate}` 
+                      : "سعر الصرف"
                   }
-                : null
-            }
-            onChange={(val: any) => updateEntry(index, "currency", val?.value || "")}
-            placeholder="اختر العملة"
-            styles={selectStyles}
-            isSearchable
-            isOptionDisabled={(option: any) => option.isDisabled}
-          />
+                  value={entry.exchangeRate || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // لو المستخدم مسح القيمة، نحذف الـ exchangeRate من الـ entry
+                    if (val === "" || val === "0") {
+                      const newEntry = { ...entry };
+                      delete newEntry.exchangeRate;
+                      onChange(
+                        entries.map((ent, i) => (i === index ? newEntry : ent))
+                      );
+                    } else {
+                      updateEntry(index, "exchangeRate", Number(val));
+                    }
+                  }}
+                  className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-sm"
+                />
+              </div>
+            </div>
 
-          {/* Amount + Exchange Rate row */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-600 dark:text-slate-400">
-                المبلغ <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                type="number"
-                placeholder="المبلغ"
-                value={entry.amount || ""}
-                onChange={(e) => updateEntry(index, "amount", Number(e.target.value))}
-                className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-sm"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-600 dark:text-slate-400">
-                سعر الصرف <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                type="number"
-                placeholder="سعر الصرف"
-                value={entry.exchangeRate || ""}
-                onChange={(e) => updateEntry(index, "exchangeRate", Number(e.target.value))}
-                className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-sm"
-              />
-            </div>
+            {/* عرض السعر المستخدم */}
+            {entry.currency && effectiveRate > 0 && (
+              <div className="text-xs flex items-center gap-2">
+                {isUsingDefaultRate ? (
+                  <>
+                    <span className="text-emerald-600 dark:text-emerald-400">⚡</span>
+                    <span className="text-slate-600 dark:text-slate-400">
+                      سعر تلقائي: <span className="font-semibold">{selectedCurrency?.exchangeRate}</span>
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-blue-600 dark:text-blue-400">📝</span>
+                    <span className="text-slate-600 dark:text-slate-400">
+                      سعر مخصص: <span className="font-semibold">{entry.exchangeRate}</span>
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* EGP preview */}
+            {entry.amount && effectiveRate ? (
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                = {(entry.amount * effectiveRate).toLocaleString()} جنيه مصري
+              </p>
+            ) : null}
           </div>
-
-          {/* EGP preview */}
-          {entry.amount && entry.exchangeRate ? (
-            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-              = {(entry.amount * entry.exchangeRate).toLocaleString()} جنيه مصري
-            </p>
-          ) : null}
-        </div>
-      ))}
+        );
+      })}
 
       <Button
         type="button"
@@ -242,14 +312,14 @@ export default function RevenuePage() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newEmployee, setNewEmployee] = useState<string | null>(null);
   const [newActivity, setNewActivity] = useState<string | null>(null);
-  const [newCurrencies, setNewCurrencies] = useState<CurrencyEntry[]>([{ currency: "", amount: 0, exchangeRate: 0 }]);
+  const [newCurrencies, setNewCurrencies] = useState<CurrencyEntry[]>([{ currency: "", amount: 0 }]);
   const [newDate, setNewDate] = useState<string>(new Date().toISOString().split("T")[0]);
   const [saving, setSaving] = useState(false);
 
   // ── Add Revenue (per-employee detail modal) ──
   const [addEmployeeRevenueDialogOpen, setAddEmployeeRevenueDialogOpen] = useState(false);
   const [addEmployeeActivity, setAddEmployeeActivity] = useState<string | null>(null);
-  const [addEmployeeCurrencies, setAddEmployeeCurrencies] = useState<CurrencyEntry[]>([{ currency: "", amount: 0, exchangeRate: 0 }]);
+  const [addEmployeeCurrencies, setAddEmployeeCurrencies] = useState<CurrencyEntry[]>([{ currency: "", amount: 0 }]);
   const [addEmployeeDate, setAddEmployeeDate] = useState<string>(new Date().toISOString().split("T")[0]);
 
   // ── Edit Revenue ──
@@ -316,11 +386,36 @@ export default function RevenuePage() {
   /** Validate that every currency row is fully filled */
   const validateCurrencies = (entries: CurrencyEntry[]): boolean =>
     entries.length > 0 &&
-    entries.every((e) => e.currency && e.amount > 0 && e.exchangeRate > 0);
+    entries.every((e) => {
+      if (!e.currency || !e.amount || e.amount <= 0) return false;
+      // التحقق من وجود سعر صرف (مُدخل أو تلقائي من الباك اند)
+      const currency = currencies.find((c) => c._id === e.currency);
+      return (e.exchangeRate && e.exchangeRate > 0) || (currency?.exchangeRate && currency.exchangeRate > 0);
+    });
 
   /** Compute total EGP preview from local entries */
   const computeTotalEGP = (entries: CurrencyEntry[]): number =>
-    entries.reduce((sum, e) => sum + (e.amount || 0) * (e.exchangeRate || 0), 0);
+    entries.reduce((sum, e) => {
+      const effectiveRate = e.exchangeRate && e.exchangeRate > 0
+        ? e.exchangeRate
+        : currencies.find((c) => c._id === e.currency)?.exchangeRate || 0;
+      return sum + (e.amount || 0) * effectiveRate;
+    }, 0);
+
+  /** تحضير البيانات للإرسال - استخدام السعر التلقائي إذا لم يكن هناك سعر مُدخل */
+  const prepareCurrenciesForSubmit = (entries: CurrencyEntry[]): any[] =>
+    entries.map((e) => {
+      const currency = currencies.find((c) => c._id === e.currency);
+      const effectiveRate = e.exchangeRate && e.exchangeRate > 0
+        ? e.exchangeRate
+        : currency?.exchangeRate || 0;
+      
+      return {
+        currency: e.currency,
+        amount: e.amount,
+        exchangeRate: effectiveRate,
+      };
+    });
 
   // ─── API calls ──────────────────────────────────────────────────────────────
 
@@ -396,13 +491,13 @@ export default function RevenuePage() {
       await axios.post(`${BASE_URL}/emp-revenue`, {
         employee: newEmployee,
         activity: newActivity,
-        currencies: newCurrencies,
+        currencies: prepareCurrenciesForSubmit(newCurrencies),
         date: newDate,
       });
       // reset
       setNewEmployee(null);
       setNewActivity(null);
-      setNewCurrencies([{ currency: "", amount: 0, exchangeRate: 0 }]);
+      setNewCurrencies([{ currency: "", amount: 0 }]);
       setNewDate(new Date().toISOString().split("T")[0]);
       setAddDialogOpen(false);
       fetchData();
@@ -426,12 +521,12 @@ export default function RevenuePage() {
       await axios.post(`${BASE_URL}/emp-revenue`, {
         employee: selectedEmployee.employee._id,
         activity: addEmployeeActivity,
-        currencies: addEmployeeCurrencies,
+        currencies: prepareCurrenciesForSubmit(addEmployeeCurrencies),
         date: addEmployeeDate,
       });
       // reset
       setAddEmployeeActivity(null);
-      setAddEmployeeCurrencies([{ currency: "", amount: 0, exchangeRate: 0 }]);
+      setAddEmployeeCurrencies([{ currency: "", amount: 0 }]);
       setAddEmployeeDate(new Date().toISOString().split("T")[0]);
       setAddEmployeeRevenueDialogOpen(false);
       fetchDetails(selectedEmployee.employee._id, page);
@@ -471,7 +566,7 @@ export default function RevenuePage() {
     try {
       await axios.patch(`${BASE_URL}/emp-revenue/${editingRevenue._id}`, {
         activity: editActivity,
-        currencies: editCurrencies,
+        currencies: prepareCurrenciesForSubmit(editCurrencies),
         date: editDate,
       });
       setEditDialogOpen(false);

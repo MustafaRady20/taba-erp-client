@@ -356,21 +356,21 @@ export default function PartnersManagementPage() {
     return profits
       .filter(
         (p) =>
-          (typeof p.partner === "string" ? p.partner : p.partner._id) ===
+          (typeof p.partner === "string" ? p?.partner : p?.partner?._id) ===
           partnerId
       )
-      .reduce((sum, p) => sum + p.profit, 0);
+      .reduce((sum, p) => sum + p?.profit, 0);
   };
 
   const getPartnerName = (partnerId: string | Partner) => {
-    if (typeof partnerId === "object") return partnerId.name;
-    const partner = partners.find((p) => p._id === partnerId);
+    if (typeof partnerId === "object") return partnerId?.name;
+    const partner = partners.find((p) => p?._id === partnerId);
     return partner?.name || "غير معروف";
   };
 
   const getActivityName = (activityId: string | Activity) => {
-    if (typeof activityId === "object") return activityId.name;
-    const activity = activities.find((a) => a._id === activityId);
+    if (typeof activityId === "object") return activityId?.name;
+    const activity = activities.find((a) => a?._id === activityId);
     return activity?.name || "غير محدد";
   };
 
@@ -497,7 +497,7 @@ export default function PartnersManagementPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <Badge variant="secondary">
-                          {getTotalProfit(partner._id).toFixed(2)} ج.م
+                          {getTotalProfit(partner?._id).toFixed(2)} ج.م
                         </Badge>
                       </TableCell>
                      
