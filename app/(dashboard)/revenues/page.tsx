@@ -97,7 +97,12 @@ interface MultiCurrencyInputProps {
   selectStyles: any;
 }
 
-function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: MultiCurrencyInputProps) {
+function MultiCurrencyInput({
+  entries,
+  onChange,
+  currencies,
+  selectStyles,
+}: MultiCurrencyInputProps) {
   const addEntry = () => {
     onChange([...entries, { currency: "", amount: 0 }]);
   };
@@ -106,11 +111,15 @@ function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: Mul
     onChange(entries.filter((_, i) => i !== index));
   };
 
-  const updateEntry = (index: number, field: keyof CurrencyEntry, value: string | number) => {
+  const updateEntry = (
+    index: number,
+    field: keyof CurrencyEntry,
+    value: string | number,
+  ) => {
     onChange(
       entries.map((entry, i) =>
-        i === index ? { ...entry, [field]: value } : entry
-      )
+        i === index ? { ...entry, [field]: value } : entry,
+      ),
     );
   };
 
@@ -124,8 +133,8 @@ function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: Mul
               amount: entry.amount,
               // نحذف exchangeRate عشان يستخدم السعر التلقائي من الباك اند
             }
-          : entry
-      )
+          : entry,
+      ),
     );
   };
 
@@ -147,8 +156,11 @@ function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: Mul
     <div className="flex flex-col gap-3">
       {entries.map((entry, index) => {
         const effectiveRate = getEffectiveExchangeRate(entry);
-        const selectedCurrency = currencies.find((c) => c._id === entry.currency);
-        const isUsingDefaultRate = !entry.exchangeRate || entry.exchangeRate === 0;
+        const selectedCurrency = currencies.find(
+          (c) => c._id === entry.currency,
+        );
+        const isUsingDefaultRate =
+          !entry.exchangeRate || entry.exchangeRate === 0;
 
         return (
           <div
@@ -176,7 +188,8 @@ function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: Mul
               options={currencies.map((c) => ({
                 value: c._id,
                 label: `${c.name} (${c.code})`,
-                isDisabled: usedCurrencyIds.includes(c._id) && entry.currency !== c._id,
+                isDisabled:
+                  usedCurrencyIds.includes(c._id) && entry.currency !== c._id,
               }))}
               value={
                 entry.currency
@@ -188,7 +201,9 @@ function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: Mul
                     }
                   : null
               }
-              onChange={(val: any) => handleCurrencyChange(index, val?.value || "")}
+              onChange={(val: any) =>
+                handleCurrencyChange(index, val?.value || "")
+              }
               placeholder="اختر العملة"
               styles={selectStyles}
               isSearchable
@@ -205,7 +220,9 @@ function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: Mul
                   type="number"
                   placeholder="المبلغ"
                   value={entry.amount || ""}
-                  onChange={(e) => updateEntry(index, "amount", Number(e.target.value))}
+                  onChange={(e) =>
+                    updateEntry(index, "amount", Number(e.target.value))
+                  }
                   className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-sm"
                 />
               </div>
@@ -216,8 +233,8 @@ function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: Mul
                 <Input
                   type="number"
                   placeholder={
-                    selectedCurrency?.exchangeRate 
-                      ? `افتراضي: ${selectedCurrency.exchangeRate}` 
+                    selectedCurrency?.exchangeRate
+                      ? `افتراضي: ${selectedCurrency.exchangeRate}`
                       : "سعر الصرف"
                   }
                   value={entry.exchangeRate || ""}
@@ -228,7 +245,7 @@ function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: Mul
                       const newEntry = { ...entry };
                       delete newEntry.exchangeRate;
                       onChange(
-                        entries.map((ent, i) => (i === index ? newEntry : ent))
+                        entries.map((ent, i) => (i === index ? newEntry : ent)),
                       );
                     } else {
                       updateEntry(index, "exchangeRate", Number(val));
@@ -244,16 +261,24 @@ function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: Mul
               <div className="text-xs flex items-center gap-2">
                 {isUsingDefaultRate ? (
                   <>
-                    <span className="text-emerald-600 dark:text-emerald-400">⚡</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">
+                      ⚡
+                    </span>
                     <span className="text-slate-600 dark:text-slate-400">
-                      سعر تلقائي: <span className="font-semibold">{selectedCurrency?.exchangeRate}</span>
+                      سعر تلقائي:{" "}
+                      <span className="font-semibold">
+                        {selectedCurrency?.exchangeRate}
+                      </span>
                     </span>
                   </>
                 ) : (
                   <>
                     <span className="text-blue-600 dark:text-blue-400">📝</span>
                     <span className="text-slate-600 dark:text-slate-400">
-                      سعر مخصص: <span className="font-semibold">{entry.exchangeRate}</span>
+                      سعر مخصص:{" "}
+                      <span className="font-semibold">
+                        {entry.exchangeRate}
+                      </span>
                     </span>
                   </>
                 )}
@@ -287,7 +312,9 @@ function MultiCurrencyInput({ entries, onChange, currencies, selectStyles }: Mul
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function RevenuePage() {
-  const [period, setPeriod] = useState<"daily" | "weekly" | "monthly" | "yearly">("monthly");
+  const [period, setPeriod] = useState<
+    "daily" | "weekly" | "monthly" | "yearly"
+  >("monthly");
   const [data, setData] = useState<EmployeeRevenue[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -295,8 +322,11 @@ export default function RevenuePage() {
   const [filterYear, setFilterYear] = useState<string>("");
   const [filterMonth, setFilterMonth] = useState<string>("");
   const [filterDate, setFilterDate] = useState<string>("");
+  const [filterActivity, setFilterActivity] = useState<string>("");
+  const [filterCurrency, setFilterCurrency] = useState<string>("");
 
-  const [selectedEmployee, setSelectedEmployee] = useState<EmployeeRevenue | null>(null);
+  const [selectedEmployee, setSelectedEmployee] =
+    useState<EmployeeRevenue | null>(null);
   const [details, setDetails] = useState<EmployeeRevenueDetail[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -312,18 +342,30 @@ export default function RevenuePage() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newEmployee, setNewEmployee] = useState<string | null>(null);
   const [newActivity, setNewActivity] = useState<string | null>(null);
-  const [newCurrencies, setNewCurrencies] = useState<CurrencyEntry[]>([{ currency: "", amount: 0 }]);
-  const [newDate, setNewDate] = useState<string>(new Date().toISOString().split("T")[0]);
+  const [newCurrencies, setNewCurrencies] = useState<CurrencyEntry[]>([
+    { currency: "", amount: 0 },
+  ]);
+  const [newDate, setNewDate] = useState<string>(
+    new Date().toISOString().split("T")[0],
+  );
   const [saving, setSaving] = useState(false);
 
   // ── Add Revenue (per-employee detail modal) ──
-  const [addEmployeeRevenueDialogOpen, setAddEmployeeRevenueDialogOpen] = useState(false);
-  const [addEmployeeActivity, setAddEmployeeActivity] = useState<string | null>(null);
-  const [addEmployeeCurrencies, setAddEmployeeCurrencies] = useState<CurrencyEntry[]>([{ currency: "", amount: 0 }]);
-  const [addEmployeeDate, setAddEmployeeDate] = useState<string>(new Date().toISOString().split("T")[0]);
+  const [addEmployeeRevenueDialogOpen, setAddEmployeeRevenueDialogOpen] =
+    useState(false);
+  const [addEmployeeActivity, setAddEmployeeActivity] = useState<string | null>(
+    null,
+  );
+  const [addEmployeeCurrencies, setAddEmployeeCurrencies] = useState<
+    CurrencyEntry[]
+  >([{ currency: "", amount: 0 }]);
+  const [addEmployeeDate, setAddEmployeeDate] = useState<string>(
+    new Date().toISOString().split("T")[0],
+  );
 
   // ── Edit Revenue ──
-  const [editingRevenue, setEditingRevenue] = useState<EmployeeRevenueDetail | null>(null);
+  const [editingRevenue, setEditingRevenue] =
+    useState<EmployeeRevenueDetail | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editActivity, setEditActivity] = useState<string>("");
   const [editCurrencies, setEditCurrencies] = useState<CurrencyEntry[]>([]);
@@ -356,20 +398,28 @@ export default function RevenuePage() {
       maxHeight: "200px",
       overflowY: "auto",
     }),
-    singleValue: (styles: any) => ({ ...styles, color: "hsl(var(--foreground))" }),
+    singleValue: (styles: any) => ({
+      ...styles,
+      color: "hsl(var(--foreground))",
+    }),
     option: (styles: any, { isSelected, isFocused }: any) => ({
       ...styles,
       backgroundColor: isSelected
         ? "hsl(var(--primary))"
         : isFocused
-        ? "hsl(var(--accent))"
-        : "hsl(var(--background))",
-      color: isSelected ? "hsl(var(--primary-foreground))" : "hsl(var(--foreground))",
+          ? "hsl(var(--accent))"
+          : "hsl(var(--background))",
+      color: isSelected
+        ? "hsl(var(--primary-foreground))"
+        : "hsl(var(--foreground))",
       cursor: "pointer",
       "&:active": { backgroundColor: "hsl(var(--primary))" },
     }),
     input: (styles: any) => ({ ...styles, color: "hsl(var(--foreground))" }),
-    placeholder: (styles: any) => ({ ...styles, color: "hsl(var(--muted-foreground))" }),
+    placeholder: (styles: any) => ({
+      ...styles,
+      color: "hsl(var(--muted-foreground))",
+    }),
   };
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -380,6 +430,8 @@ export default function RevenuePage() {
     if (filterYear) params.append("year", filterYear);
     if (filterMonth) params.append("month", filterMonth);
     if (filterDate) params.append("date", filterDate);
+    if (filterActivity) params.append("activity", filterActivity);
+    if (filterCurrency) params.append("currency", filterCurrency);
     return params.toString();
   };
 
@@ -390,15 +442,19 @@ export default function RevenuePage() {
       if (!e.currency || !e.amount || e.amount <= 0) return false;
       // التحقق من وجود سعر صرف (مُدخل أو تلقائي من الباك اند)
       const currency = currencies.find((c) => c._id === e.currency);
-      return (e.exchangeRate && e.exchangeRate > 0) || (currency?.exchangeRate && currency.exchangeRate > 0);
+      return (
+        (e.exchangeRate && e.exchangeRate > 0) ||
+        (currency?.exchangeRate && currency.exchangeRate > 0)
+      );
     });
 
   /** Compute total EGP preview from local entries */
   const computeTotalEGP = (entries: CurrencyEntry[]): number =>
     entries.reduce((sum, e) => {
-      const effectiveRate = e.exchangeRate && e.exchangeRate > 0
-        ? e.exchangeRate
-        : currencies.find((c) => c._id === e.currency)?.exchangeRate || 0;
+      const effectiveRate =
+        e.exchangeRate && e.exchangeRate > 0
+          ? e.exchangeRate
+          : currencies.find((c) => c._id === e.currency)?.exchangeRate || 0;
       return sum + (e.amount || 0) * effectiveRate;
     }, 0);
 
@@ -406,10 +462,11 @@ export default function RevenuePage() {
   const prepareCurrenciesForSubmit = (entries: CurrencyEntry[]): any[] =>
     entries.map((e) => {
       const currency = currencies.find((c) => c._id === e.currency);
-      const effectiveRate = e.exchangeRate && e.exchangeRate > 0
-        ? e.exchangeRate
-        : currency?.exchangeRate || 0;
-      
+      const effectiveRate =
+        e.exchangeRate && e.exchangeRate > 0
+          ? e.exchangeRate
+          : currency?.exchangeRate || 0;
+
       return {
         currency: e.currency,
         amount: e.amount,
@@ -422,7 +479,9 @@ export default function RevenuePage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${BASE_URL}/emp-revenue/report?${buildQueryParams()}`);
+      const res = await axios.get(
+        `${BASE_URL}/emp-revenue/report?${buildQueryParams()}`,
+      );
       setData(res.data.revenueByEmployee || []);
     } catch (error) {
       console.error("خطأ في جلب البيانات:", error);
@@ -435,7 +494,7 @@ export default function RevenuePage() {
     setLoadingDetails(true);
     try {
       const res = await axios.get(
-        `${BASE_URL}/emp-revenue/employee/${employeeId}?page=${pageNum}&limit=${limit}`
+        `${BASE_URL}/emp-revenue/employee/${employeeId}?page=${pageNum}&limit=${limit}`,
       );
       setDetails(res.data.data || []);
       setTotalPages(res.data.totalPages || 1);
@@ -464,7 +523,14 @@ export default function RevenuePage() {
   useEffect(() => {
     fetchData();
     fetchEmployeesActivitiesAndCurrencies();
-  }, [period, filterYear, filterMonth, filterDate]);
+  }, [
+    period,
+    filterYear,
+    filterMonth,
+    filterDate,
+    filterActivity,
+    filterCurrency,
+  ]);
 
   // ─── Handlers ───────────────────────────────────────────────────────────────
 
@@ -512,7 +578,11 @@ export default function RevenuePage() {
 
   /** Per-employee detail modal "Add Revenue" */
   const handleAddEmployeeRevenue = async () => {
-    if (!selectedEmployee || !addEmployeeActivity || !validateCurrencies(addEmployeeCurrencies)) {
+    if (
+      !selectedEmployee ||
+      !addEmployeeActivity ||
+      !validateCurrencies(addEmployeeCurrencies)
+    ) {
       alert("يرجى ملء جميع الحقول المطلوبة بشكل صحيح");
       return;
     }
@@ -551,14 +621,18 @@ export default function RevenuePage() {
         currency: c.currency._id,
         amount: c.amount,
         exchangeRate: c.exchangeRate,
-      }))
+      })),
     );
     setEditDialogOpen(true);
   };
 
   /** Submit edit */
   const handleUpdateRevenue = async () => {
-    if (!editingRevenue || !editActivity || !validateCurrencies(editCurrencies)) {
+    if (
+      !editingRevenue ||
+      !editActivity ||
+      !validateCurrencies(editCurrencies)
+    ) {
       alert("يرجى ملء جميع الحقول المطلوبة بشكل صحيح");
       return;
     }
@@ -599,16 +673,24 @@ export default function RevenuePage() {
     setFilterYear("");
     setFilterMonth("");
     setFilterDate("");
+    setFilterActivity("");
+    setFilterCurrency("");
   };
 
   const getTotalRevenue = () => data.reduce((sum, emp) => sum + emp.total, 0);
 
   const getPeriodLabel = () => {
-    const labels = { daily: "يومي", weekly: "أسبوعي", monthly: "شهري", yearly: "سنوي" };
+    const labels = {
+      daily: "يومي",
+      weekly: "أسبوعي",
+      monthly: "شهري",
+      yearly: "سنوي",
+    };
     return labels[period];
   };
 
-  const hasActiveFilters = filterYear || filterMonth || filterDate;
+  const hasActiveFilters =
+    filterYear || filterMonth || filterDate || filterActivity || filterCurrency;
 
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 10 }, (_, i) => ({
@@ -727,8 +809,20 @@ export default function RevenuePage() {
                     الموظف <span className="text-red-500">*</span>
                   </Label>
                   <Select
-                    options={employees.map((e) => ({ value: e._id, label: e.name }))}
-                    value={newEmployee ? { value: newEmployee, label: employees.find((e) => e._id === newEmployee)?.name || "" } : null}
+                    options={employees.map((e) => ({
+                      value: e._id,
+                      label: e.name,
+                    }))}
+                    value={
+                      newEmployee
+                        ? {
+                            value: newEmployee,
+                            label:
+                              employees.find((e) => e._id === newEmployee)
+                                ?.name || "",
+                          }
+                        : null
+                    }
                     onChange={(val: any) => setNewEmployee(val.value)}
                     placeholder="اختر الموظف"
                     styles={selectStyles}
@@ -743,8 +837,20 @@ export default function RevenuePage() {
                     النشاط <span className="text-red-500">*</span>
                   </Label>
                   <Select
-                    options={activities.map((a) => ({ value: a._id, label: a.name }))}
-                    value={newActivity ? { value: newActivity, label: activities.find((a) => a._id === newActivity)?.name || "" } : null}
+                    options={activities.map((a) => ({
+                      value: a._id,
+                      label: a.name,
+                    }))}
+                    value={
+                      newActivity
+                        ? {
+                            value: newActivity,
+                            label:
+                              activities.find((a) => a._id === newActivity)
+                                ?.name || "",
+                          }
+                        : null
+                    }
                     onChange={(val: any) => setNewActivity(val.value)}
                     placeholder="اختر النشاط"
                     styles={selectStyles}
@@ -768,7 +874,8 @@ export default function RevenuePage() {
                   {computeTotalEGP(newCurrencies) > 0 && (
                     <div className="mt-2 p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg border border-emerald-200 dark:border-emerald-500/20">
                       <p className="text-sm text-emerald-700 dark:text-emerald-400 font-semibold text-right">
-                        الإجمالي بالجنيه المصري: {computeTotalEGP(newCurrencies).toLocaleString()} جنيه
+                        الإجمالي بالجنيه المصري:{" "}
+                        {computeTotalEGP(newCurrencies).toLocaleString()} جنيه
                       </p>
                     </div>
                   )}
@@ -804,7 +911,9 @@ export default function RevenuePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="border-2 border-emerald-200 dark:border-emerald-500/20 bg-gradient-to-br from-white to-emerald-50 dark:from-slate-900 dark:to-slate-800 shadow-lg hover:shadow-xl transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300">إجمالي الإيرادات</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                إجمالي الإيرادات
+              </CardTitle>
               <div className="p-2 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg">
                 <TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
@@ -813,33 +922,47 @@ export default function RevenuePage() {
               <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
                 {getTotalRevenue().toLocaleString()} جنيه
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">إجمالي إيرادات جميع الموظفين</p>
+              <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">
+                إجمالي إيرادات جميع الموظفين
+              </p>
             </CardContent>
           </Card>
 
           <Card className="border-2 border-cyan-200 dark:border-cyan-500/20 bg-gradient-to-br from-white to-cyan-50 dark:from-slate-900 dark:to-slate-800 shadow-lg hover:shadow-xl transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300">عدد الموظفين</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                عدد الموظفين
+              </CardTitle>
               <div className="p-2 bg-cyan-100 dark:bg-cyan-500/10 rounded-lg">
                 <User className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-cyan-600 dark:text-cyan-400">{data.length}</div>
-              <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">موظف لديه إيرادات</p>
+              <div className="text-3xl font-bold text-cyan-600 dark:text-cyan-400">
+                {data.length}
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">
+                موظف لديه إيرادات
+              </p>
             </CardContent>
           </Card>
 
           <Card className="border-2 border-purple-200 dark:border-purple-500/20 bg-gradient-to-br from-white to-purple-50 dark:from-slate-900 dark:to-slate-800 shadow-lg hover:shadow-xl transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300">الفترة الحالية</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                الفترة الحالية
+              </CardTitle>
               <div className="p-2 bg-purple-100 dark:bg-purple-500/10 rounded-lg">
                 <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{getPeriodLabel()}</div>
-              <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">عرض البيانات حسب الفترة</p>
+              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                {getPeriodLabel()}
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">
+                عرض البيانات حسب الفترة
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -853,14 +976,18 @@ export default function RevenuePage() {
                 الفلاتر والتصفية
               </CardTitle>
               {hasActiveFilters && (
-                <Badge className="bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border-cyan-200 dark:border-cyan-500/30">فلاتر نشطة</Badge>
+                <Badge className="bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border-cyan-200 dark:border-cyan-500/30">
+                  فلاتر نشطة
+                </Badge>
               )}
             </div>
           </CardHeader>
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="space-y-2">
-                <Label className="text-slate-700 dark:text-slate-300">الفترة الزمنية</Label>
+                <Label className="text-slate-700 dark:text-slate-300">
+                  الفترة الزمنية
+                </Label>
                 <Select
                   options={[
                     { value: "daily", label: "يومي" },
@@ -874,10 +1001,14 @@ export default function RevenuePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-700 dark:text-slate-300">السنة</Label>
+                <Label className="text-slate-700 dark:text-slate-300">
+                  السنة
+                </Label>
                 <Select
                   options={yearOptions}
-                  value={filterYear ? { value: filterYear, label: filterYear } : null}
+                  value={
+                    filterYear ? { value: filterYear, label: filterYear } : null
+                  }
                   onChange={(val: any) => setFilterYear(val?.value || "")}
                   placeholder="اختر السنة"
                   styles={selectStyles}
@@ -885,10 +1016,16 @@ export default function RevenuePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-700 dark:text-slate-300">الشهر</Label>
+                <Label className="text-slate-700 dark:text-slate-300">
+                  الشهر
+                </Label>
                 <Select
                   options={monthOptions}
-                  value={filterMonth ? monthOptions.find((m) => m.value === filterMonth) : null}
+                  value={
+                    filterMonth
+                      ? monthOptions.find((m) => m.value === filterMonth)
+                      : null
+                  }
                   onChange={(val: any) => setFilterMonth(val?.value || "")}
                   placeholder="اختر الشهر"
                   styles={selectStyles}
@@ -896,12 +1033,70 @@ export default function RevenuePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-700 dark:text-slate-300">تاريخ محدد</Label>
+                <Label className="text-slate-700 dark:text-slate-300">
+                  تاريخ محدد
+                </Label>
                 <Input
                   type="date"
                   value={filterDate}
                   onChange={(e) => setFilterDate(e.target.value)}
                   className="bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700 dark:text-slate-300">
+                  النشاط
+                </Label>
+                <Select
+                  options={activities.map((a) => ({
+                    value: a._id,
+                    label: a.name,
+                  }))}
+                  value={
+                    filterActivity
+                      ? {
+                          value: filterActivity,
+                          label:
+                            activities.find((a) => a._id === filterActivity)
+                              ?.name || "",
+                        }
+                      : null
+                  }
+                  onChange={(val: any) => setFilterActivity(val?.value || "")}
+                  placeholder="كل الأنشطة"
+                  styles={selectStyles}
+                  isClearable
+                  isSearchable
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-slate-700 dark:text-slate-300">
+                  العملة
+                </Label>
+                <Select
+                  options={currencies.map((c) => ({
+                    value: c._id,
+                    label: `${c.name} (${c.code})`,
+                  }))}
+                  value={
+                    filterCurrency
+                      ? {
+                          value: filterCurrency,
+                          label: (() => {
+                            const c = currencies.find(
+                              (c) => c._id === filterCurrency,
+                            );
+                            return c ? `${c.name} (${c.code})` : "";
+                          })(),
+                        }
+                      : null
+                  }
+                  onChange={(val: any) => setFilterCurrency(val?.value || "")}
+                  placeholder="كل العملات"
+                  styles={selectStyles}
+                  isClearable
+                  isSearchable
                 />
               </div>
             </div>
@@ -925,16 +1120,20 @@ export default function RevenuePage() {
                 <p className="text-sm text-cyan-700 dark:text-cyan-300 text-right">
                   الفلاتر النشطة:
                   {filterYear && (
-                    <Badge className="mr-2 bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-500/30">السنة: {filterYear}</Badge>
+                    <Badge className="mr-2 bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-500/30">
+                      السنة: {filterYear}
+                    </Badge>
                   )}
                   {filterMonth && (
                     <Badge className="mr-2 bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-500/30">
-                      الشهر: {monthOptions.find((m) => m.value === filterMonth)?.label}
+                      الشهر:{" "}
+                      {monthOptions.find((m) => m.value === filterMonth)?.label}
                     </Badge>
                   )}
                   {filterDate && (
                     <Badge className="mr-2 bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-500/30">
-                      التاريخ: {new Date(filterDate).toLocaleDateString("ar-EG")}
+                      التاريخ:{" "}
+                      {new Date(filterDate).toLocaleDateString("ar-EG")}
                     </Badge>
                   )}
                 </p>
@@ -946,16 +1145,24 @@ export default function RevenuePage() {
         {/* ── Main Table ── */}
         <Card className="shadow-lg bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
           <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 border-b border-slate-200 dark:border-slate-700">
-            <CardTitle className="text-slate-900 dark:text-white">إيرادات الموظفين ({data.length})</CardTitle>
+            <CardTitle className="text-slate-900 dark:text-white">
+              إيرادات الموظفين ({data.length})
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 border-slate-200 dark:border-slate-800">
-                    <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">الموظف</TableHead>
-                    <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">إجمالي الإيرادات</TableHead>
-                    <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">الإجراء</TableHead>
+                    <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">
+                      الموظف
+                    </TableHead>
+                    <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">
+                      إجمالي الإيرادات
+                    </TableHead>
+                    <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">
+                      الإجراء
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -964,7 +1171,9 @@ export default function RevenuePage() {
                       <TableCell colSpan={3} className="text-center py-12">
                         <div className="flex flex-col items-center gap-4">
                           <div className="w-12 h-12 border-4 border-emerald-200 dark:border-emerald-800 border-t-emerald-600 dark:border-t-emerald-400 rounded-full animate-spin"></div>
-                          <p className="text-slate-600 dark:text-slate-400">جاري التحميل...</p>
+                          <p className="text-slate-600 dark:text-slate-400">
+                            جاري التحميل...
+                          </p>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -975,7 +1184,9 @@ export default function RevenuePage() {
                           <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
                             <TrendingUp className="w-10 h-10 text-slate-400 dark:text-slate-600" />
                           </div>
-                          <p className="text-slate-600 dark:text-slate-400 font-medium">لا توجد بيانات</p>
+                          <p className="text-slate-600 dark:text-slate-400 font-medium">
+                            لا توجد بيانات
+                          </p>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -984,7 +1195,9 @@ export default function RevenuePage() {
                       <TableRow
                         key={emp._id}
                         className={`border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors ${
-                          index % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50/50 dark:bg-slate-900/50"
+                          index % 2 === 0
+                            ? "bg-white dark:bg-slate-900"
+                            : "bg-slate-50/50 dark:bg-slate-900/50"
                         }`}
                       >
                         <TableCell className="text-center">
@@ -993,8 +1206,12 @@ export default function RevenuePage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-center">
-                          <span className="font-bold text-emerald-600 dark:text-emerald-400 text-lg">{emp?.total?.toLocaleString()}</span>
-                          <span className="text-slate-500 dark:text-slate-500 text-sm mr-1">جنيه</span>
+                          <span className="font-bold text-emerald-600 dark:text-emerald-400 text-lg">
+                            {emp?.total?.toLocaleString()}
+                          </span>
+                          <span className="text-slate-500 dark:text-slate-500 text-sm mr-1">
+                            جنيه
+                          </span>
                         </TableCell>
                         <TableCell className="text-center">
                           {/* ── Employee Detail Dialog ── */}
@@ -1018,9 +1235,17 @@ export default function RevenuePage() {
                                   </DialogTitle>
 
                                   {/* ── Per-employee Add Dialog ── */}
-                                  <Dialog open={addEmployeeRevenueDialogOpen} onOpenChange={setAddEmployeeRevenueDialogOpen}>
+                                  <Dialog
+                                    open={addEmployeeRevenueDialogOpen}
+                                    onOpenChange={
+                                      setAddEmployeeRevenueDialogOpen
+                                    }
+                                  >
                                     <DialogTrigger asChild>
-                                      <Button size="sm" className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white">
+                                      <Button
+                                        size="sm"
+                                        className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white"
+                                      >
                                         <Plus className="w-4 h-4 ml-2" />
                                         إضافة إيراد
                                       </Button>
@@ -1037,12 +1262,32 @@ export default function RevenuePage() {
                                         <div className="space-y-2">
                                           <Label className="text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                             <ActivityIcon className="w-4 h-4" />
-                                            النشاط <span className="text-red-500">*</span>
+                                            النشاط{" "}
+                                            <span className="text-red-500">
+                                              *
+                                            </span>
                                           </Label>
                                           <Select
-                                            options={activities.map((a) => ({ value: a._id, label: a.name }))}
-                                            value={addEmployeeActivity ? { value: addEmployeeActivity, label: activities.find((a) => a._id === addEmployeeActivity)?.name || "" } : null}
-                                            onChange={(val: any) => setAddEmployeeActivity(val.value)}
+                                            options={activities.map((a) => ({
+                                              value: a._id,
+                                              label: a.name,
+                                            }))}
+                                            value={
+                                              addEmployeeActivity
+                                                ? {
+                                                    value: addEmployeeActivity,
+                                                    label:
+                                                      activities.find(
+                                                        (a) =>
+                                                          a._id ===
+                                                          addEmployeeActivity,
+                                                      )?.name || "",
+                                                  }
+                                                : null
+                                            }
+                                            onChange={(val: any) =>
+                                              setAddEmployeeActivity(val.value)
+                                            }
                                             placeholder="اختر النشاط"
                                             styles={selectStyles}
                                             isSearchable
@@ -1053,7 +1298,10 @@ export default function RevenuePage() {
                                         <div className="space-y-2">
                                           <Label className="text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                             <Coins className="w-4 h-4" />
-                                            العملات والمبالغ <span className="text-red-500">*</span>
+                                            العملات والمبالغ{" "}
+                                            <span className="text-red-500">
+                                              *
+                                            </span>
                                           </Label>
                                           <MultiCurrencyInput
                                             entries={addEmployeeCurrencies}
@@ -1061,10 +1309,16 @@ export default function RevenuePage() {
                                             currencies={currencies}
                                             selectStyles={selectStyles}
                                           />
-                                          {computeTotalEGP(addEmployeeCurrencies) > 0 && (
+                                          {computeTotalEGP(
+                                            addEmployeeCurrencies,
+                                          ) > 0 && (
                                             <div className="mt-2 p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg border border-emerald-200 dark:border-emerald-500/20">
                                               <p className="text-sm text-emerald-700 dark:text-emerald-400 font-semibold text-right">
-                                                الإجمالي بالجنيه المصري: {computeTotalEGP(addEmployeeCurrencies).toLocaleString()} جنيه
+                                                الإجمالي بالجنيه المصري:{" "}
+                                                {computeTotalEGP(
+                                                  addEmployeeCurrencies,
+                                                ).toLocaleString()}{" "}
+                                                جنيه
                                               </p>
                                             </div>
                                           )}
@@ -1079,7 +1333,9 @@ export default function RevenuePage() {
                                           <Input
                                             type="date"
                                             value={addEmployeeDate}
-                                            onChange={(e) => setAddEmployeeDate(e.target.value)}
+                                            onChange={(e) =>
+                                              setAddEmployeeDate(e.target.value)
+                                            }
                                             className="bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white"
                                           />
                                         </div>
@@ -1089,7 +1345,9 @@ export default function RevenuePage() {
                                           isLoading={saving}
                                           loadingLabel="جاري الحفظ..."
                                           submitLabel="حفظ"
-                                          submitIcon={<Plus className="w-4 h-4 ml-2" />}
+                                          submitIcon={
+                                            <Plus className="w-4 h-4 ml-2" />
+                                          }
                                         />
                                       </div>
                                     </DialogContent>
@@ -1100,11 +1358,15 @@ export default function RevenuePage() {
                               {loadingDetails ? (
                                 <div className="flex flex-col items-center gap-4 py-12">
                                   <div className="w-12 h-12 border-4 border-emerald-200 dark:border-emerald-800 border-t-emerald-600 dark:border-t-emerald-400 rounded-full animate-spin"></div>
-                                  <p className="text-slate-600 dark:text-slate-400">جاري التحميل...</p>
+                                  <p className="text-slate-600 dark:text-slate-400">
+                                    جاري التحميل...
+                                  </p>
                                 </div>
                               ) : details.length === 0 ? (
                                 <div className="text-center py-12">
-                                  <p className="text-slate-600 dark:text-slate-400">لا توجد تفاصيل</p>
+                                  <p className="text-slate-600 dark:text-slate-400">
+                                    لا توجد تفاصيل
+                                  </p>
                                 </div>
                               ) : (
                                 <>
@@ -1112,11 +1374,21 @@ export default function RevenuePage() {
                                     <Table>
                                       <TableHeader>
                                         <TableRow className="bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800">
-                                          <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">التاريخ</TableHead>
-                                          <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">النشاط</TableHead>
-                                          <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">العملات والمبالغ</TableHead>
-                                          <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">الإجمالي (جنيه)</TableHead>
-                                          <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">الإجراءات</TableHead>
+                                          <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">
+                                            التاريخ
+                                          </TableHead>
+                                          <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">
+                                            النشاط
+                                          </TableHead>
+                                          <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">
+                                            العملات والمبالغ
+                                          </TableHead>
+                                          <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">
+                                            الإجمالي (جنيه)
+                                          </TableHead>
+                                          <TableHead className="text-center font-semibold text-slate-700 dark:text-slate-300">
+                                            الإجراءات
+                                          </TableHead>
                                         </TableRow>
                                       </TableHeader>
                                       <TableBody>
@@ -1124,11 +1396,15 @@ export default function RevenuePage() {
                                           <TableRow
                                             key={d._id}
                                             className={`border-slate-200 dark:border-slate-800 ${
-                                              idx % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50/50 dark:bg-slate-900/50"
+                                              idx % 2 === 0
+                                                ? "bg-white dark:bg-slate-900"
+                                                : "bg-slate-50/50 dark:bg-slate-900/50"
                                             }`}
                                           >
                                             <TableCell className="text-center text-slate-700 dark:text-slate-300">
-                                              {new Date(d.date).toLocaleDateString("ar-EG")}
+                                              {new Date(
+                                                d.date,
+                                              ).toLocaleDateString("ar-EG")}
                                             </TableCell>
                                             <TableCell className="text-center">
                                               <Badge className="bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/30">
@@ -1140,7 +1416,10 @@ export default function RevenuePage() {
                                             <TableCell className="text-center">
                                               <div className="flex flex-col items-center gap-1">
                                                 {d.currencies.map((c, ci) => (
-                                                  <span key={ci} className="text-sm text-slate-700 dark:text-slate-300">
+                                                  <span
+                                                    key={ci}
+                                                    className="text-sm text-slate-700 dark:text-slate-300"
+                                                  >
                                                     <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                                                       {c.amount.toLocaleString()}
                                                     </span>{" "}
@@ -1160,16 +1439,25 @@ export default function RevenuePage() {
                                               <span className="font-bold text-emerald-600 dark:text-emerald-400">
                                                 {(
                                                   d.totalEGPAmount ??
-                                                  d.currencies.reduce((s, c) => s + c.amount * c.exchangeRate, 0)
+                                                  d.currencies.reduce(
+                                                    (s, c) =>
+                                                      s +
+                                                      c.amount * c.exchangeRate,
+                                                    0,
+                                                  )
                                                 ).toLocaleString()}
                                               </span>
-                                              <span className="text-slate-500 dark:text-slate-500 text-sm mr-1">جنيه</span>
+                                              <span className="text-slate-500 dark:text-slate-500 text-sm mr-1">
+                                                جنيه
+                                              </span>
                                             </TableCell>
 
                                             <TableCell className="text-center">
                                               <div className="flex items-center justify-center gap-2">
                                                 <Button
-                                                  onClick={() => handleEditRevenue(d)}
+                                                  onClick={() =>
+                                                    handleEditRevenue(d)
+                                                  }
                                                   variant="outline"
                                                   size="sm"
                                                   className="bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-500/20"
@@ -1177,7 +1465,9 @@ export default function RevenuePage() {
                                                   <Edit className="w-4 h-4" />
                                                 </Button>
                                                 <Button
-                                                  onClick={() => handleDeleteRevenue(d._id)}
+                                                  onClick={() =>
+                                                    handleDeleteRevenue(d._id)
+                                                  }
                                                   variant="outline"
                                                   size="sm"
                                                   className="bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-500/20"
@@ -1204,7 +1494,9 @@ export default function RevenuePage() {
                                       <ChevronRight className="w-4 h-4" />
                                       السابق
                                     </Button>
-                                    <span className="text-slate-700 dark:text-slate-300 font-medium">الصفحة {page} من {totalPages}</span>
+                                    <span className="text-slate-700 dark:text-slate-300 font-medium">
+                                      الصفحة {page} من {totalPages}
+                                    </span>
                                     <Button
                                       disabled={page === totalPages}
                                       onClick={() => handlePageChange(page + 1)}
@@ -1251,8 +1543,20 @@ export default function RevenuePage() {
                 النشاط <span className="text-red-500">*</span>
               </Label>
               <Select
-                options={activities.map((a) => ({ value: a._id, label: a.name }))}
-                value={editActivity ? { value: editActivity, label: activities.find((a) => a._id === editActivity)?.name || "" } : null}
+                options={activities.map((a) => ({
+                  value: a._id,
+                  label: a.name,
+                }))}
+                value={
+                  editActivity
+                    ? {
+                        value: editActivity,
+                        label:
+                          activities.find((a) => a._id === editActivity)
+                            ?.name || "",
+                      }
+                    : null
+                }
                 onChange={(val: any) => setEditActivity(val.value)}
                 placeholder="اختر النشاط"
                 styles={selectStyles}
@@ -1275,7 +1579,8 @@ export default function RevenuePage() {
               {computeTotalEGP(editCurrencies) > 0 && (
                 <div className="mt-2 p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg border border-emerald-200 dark:border-emerald-500/20">
                   <p className="text-sm text-emerald-700 dark:text-emerald-400 font-semibold text-right">
-                    الإجمالي بالجنيه المصري: {computeTotalEGP(editCurrencies).toLocaleString()} جنيه
+                    الإجمالي بالجنيه المصري:{" "}
+                    {computeTotalEGP(editCurrencies).toLocaleString()} جنيه
                   </p>
                 </div>
               )}
